@@ -1,0 +1,115 @@
+PROGRAM Akhir
+
+// Initialize global variables
+DECLARE ArrayList noPelanggan, namaPelanggan, alamatPelanggan
+DECLARE ArrayList kodeSimpanan, jumlahDp
+DECLARE ArrayList totalBunga
+DECLARE boolean isRunning = true
+DECLARE BufferedReader br
+
+MAIN PROCEDURE
+    DISPLAY program header and savings list
+    WHILE isRunning
+        CALL showMenu()
+    END WHILE
+END MAIN
+
+PROCEDURE showMenu()
+    DISPLAY menu options (1-5)
+    READ selectedMenu
+    
+    SWITCH selectedMenu
+        CASE 1: CALL showAllPelanggan()
+        CASE 2: CALL inputPelanggan()
+        CASE 3: CALL editPelanggan()
+        CASE 4: CALL deletePelanggan()
+        CASE 5: 
+            SET isRunning = false
+            DISPLAY "Program dihentikan"
+        DEFAULT: DISPLAY "Menu tidak valid!"
+    END SWITCH
+END PROCEDURE
+
+PROCEDURE showAllPelanggan()
+    SET recordsPerPage = 3
+    SET page = 1
+    SET totalPages = CEILING(noPelanggan.size / recordsPerPage)
+    
+    WHILE true
+        IF noPelanggan is empty THEN
+            DISPLAY "Data Pelanggan Tidak tersedia!"
+            RETURN
+        END IF
+        
+        DISPLAY table header
+        SET start = (page - 1) * recordsPerPage
+        SET end = MINIMUM(start + recordsPerPage, noPelanggan.size)
+        SET grandTotal = 0
+        
+        FOR i = start TO end - 1
+            CALCULATE totalSimpanan = jumlahDp[i] + jumlahDp[i] * totalBunga[i]
+            ADD totalSimpanan TO grandTotal
+            DISPLAY formatted row with customer data
+        END FOR
+        
+        DISPLAY grandTotal
+        HANDLE pagination (next/previous/exit)
+    END WHILE
+END PROCEDURE
+
+PROCEDURE inputPelanggan()
+    SET berjalan = true
+    WHILE berjalan
+        READ nomor, nama, alamat, kode, dp
+        
+        CALCULATE bunga based on dp:
+            IF dp ≤ 1000000 THEN bunga = 0.01
+            ELSE IF dp ≤ 2000000 THEN bunga = 0.02
+            ELSE IF dp > 2000000 THEN bunga = 0.03
+        
+        ADD data to respective ArrayLists
+        
+        DISPLAY "Data berhasil ditambahkan"
+        ASK to add more data
+        IF answer ≠ "y" THEN
+            SET berjalan = false
+        END IF
+    END WHILE
+END PROCEDURE
+
+PROCEDURE editPelanggan()
+    CALL showAllPelanggan()
+    READ index to edit
+    
+    IF index is valid THEN
+        READ new customer data
+        CALCULATE new bunga based on new dp
+        UPDATE data in ArrayLists
+        DISPLAY "Data berhasil diubah!"
+    ELSE
+        DISPLAY "Data tidak ada dalam database!"
+    END IF
+END PROCEDURE
+
+PROCEDURE deletePelanggan()
+    CALL showAllPelanggan()
+    READ index to delete
+    
+    IF index is valid THEN
+        REMOVE data from all ArrayLists
+        DISPLAY "Data berhasil dihapus!"
+    ELSE
+        DISPLAY "Data tidak ada dalam database!"
+    END IF
+END PROCEDURE
+
+FUNCTION getSimpanan(kode)
+    SWITCH kode
+        CASE 1: RETURN "Simpanan Fitri"
+        CASE 2: RETURN "Simpanan Qurban"
+        CASE 3: RETURN "Simpedes"
+        CASE 4: RETURN "Simpanan Akhirat"
+        CASE 5: RETURN "Simpanan Umroh"
+        DEFAULT: RETURN "Simpanan Giat"
+    END SWITCH
+END FUNCTION
