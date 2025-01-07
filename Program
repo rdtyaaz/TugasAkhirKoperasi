@@ -1,0 +1,288 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package akhir;
+import java.io.*;
+import java.util.*;
+/**
+ *
+ * @author ASUS
+ */
+public class Akhir {
+
+    /**
+     * @param args the command line arguments
+     */
+    
+    static ArrayList<String> noPelanggan = new ArrayList<>();
+    static ArrayList<String> namaPelanggan = new ArrayList<>();
+    static ArrayList<String> alamatPelanggan = new ArrayList<>();
+    static ArrayList<Integer> kodeSimpanan = new ArrayList<>();
+    static ArrayList<Integer> jumlahDp = new ArrayList<>();
+    static ArrayList<Double> totalBunga = new ArrayList<>();
+    static boolean isRunning = true;
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+    public static void main(String[] args) throws IOException {
+         System.out.println("---------KOPERASI SIMPAN PINJAM---------");
+        System.out.println("----24.240.0084 | Muhammad Raditya Z----");
+        System.out.println("----------------------------------------");
+        
+        System.out.print("=====Daftar Simpanan=====\n"
+                + "1. Simpanan Fitri\n"
+                + "2. Simpanan Qurban\n"
+                + "3. Simpedes\n"
+                + "4. Simpanan Akhirat\n"
+                + "5. Simpanan Umroh\n"
+                + "6. Simpanan Giat\n");
+        
+    
+        while (isRunning) {
+            showMenu();
+        }
+    }
+
+    static void showMenu() throws IOException {
+        System.out.println("\n======== MENU ========");
+        System.out.println("1. Lihat Data Pelanggan");
+        System.out.println("2. Tambah Data Pelanggan");
+        System.out.println("3. Edit Data Pelanggan");
+        System.out.println("4. Hapus Data Pelanggan");
+        System.out.println("5. Keluar");
+        System.out.print("Pilih menu: ");
+
+        int selectedMenu = Integer.parseInt(br.readLine());
+
+        switch (selectedMenu) {
+            case 1:
+                showAllPelanggan();
+                break;
+            case 2:
+                inputPelanggan();
+                break;
+            case 3:
+                editPelanggan();
+                break;
+            case 4:
+                deletePelanggan();
+                break;
+            case 5:
+                isRunning = false;
+                System.out.println("Program dihentikan. Terima kasih!");
+                break;
+            default:
+                System.out.println("Menu tidak valid!");
+        }
+    }
+    
+static void showAllPelanggan() {
+    Scanner scanner = new Scanner(System.in);
+    int page = 1;
+    int recordsPerPage = 3;
+    int totalPages = (int) Math.ceil((double) noPelanggan.size() / recordsPerPage);
+
+    while (true) {
+        System.out.println("\n"
+                         + "=================================================== KOPERASI SIMPAN PINJAM ==============================================================\n");
+        System.out.println("    DATA PELANGGAN                                                                                                           Hal "+page+"\n");
+
+        if (noPelanggan.isEmpty()) {
+            System.out.println("Data Pelanggan Tidak tersedia!");
+            return;
+        } else {
+            double grandTotal = 0;
+        
+            System.out.printf("+-----+-----------------+---------------------+--------------+--------------------+-----------------+----------------+---------------+\n"); 
+            System.out.printf("| No  | Nomor Pelanggan |    Nama Pelanggan   |    Alamat    |      Koperasi      |    Simpanan     |  Bunga(persen) |     Total     |\n");
+            System.out.printf("|-----|-----------------|---------------------|--------------|--------------------|-----------------|----------------|---------------|\n");
+
+            int start = (page - 1) * recordsPerPage;
+            int end = Math.min(start + recordsPerPage, noPelanggan.size());
+
+            for (int i = start; i < end; i++) {
+                double totalSimpanan = jumlahDp.get(i) + jumlahDp.get(i) * totalBunga.get(i);
+                grandTotal += totalSimpanan;
+
+                System.out.printf("|%-5d|%-17s|%-21s|%-14s|%-20s|%-17d|%-16.0f|%-15.0f|\n",
+                    i + 1,
+                    noPelanggan.get(i),
+                    namaPelanggan.get(i),
+                    alamatPelanggan.get(i),
+                    getSimpanan(kodeSimpanan.get(i)),
+                    jumlahDp.get(i),
+                    totalBunga.get(i)*100,
+                    totalSimpanan
+                );
+            }
+
+            System.out.printf("|------------------------------------------------------------------------------------------------------------------------------------|\n");
+
+            System.out.printf("|         Total Angsuran Pelanggan            |                                                                      |%-15.0f|\n",
+                grandTotal
+            );
+
+            System.out.printf("|------------------------------------------------------------------------------------------------------------------------------------|\n");
+        }
+
+        if (page < totalPages) {
+            System.out.print("\nTekan 'n' untuk halaman berikutnya atau 'k' untuk keluar: ");
+        } else if (page > 1) {
+            System.out.print("\nTekan 'b' untuk halaman sebelumnya atau 'k' untuk keluar: ");
+        } else {
+            System.out.print("\nTekan 'n' untuk halaman berikutnya atau 'k' untuk keluar: ");
+        }
+
+        String input = scanner.nextLine();
+
+        if (input.equalsIgnoreCase("n") && page < totalPages) {
+            page++;
+        } else if (input.equalsIgnoreCase("b") && page > 1) {
+            page--;
+        } else if (input.equalsIgnoreCase("k")) {
+            break;
+        } else {
+            System.out.println("Input tidak valid. Silakan coba lagi.");
+        }
+    }
+}
+
+    static void inputPelanggan() throws IOException {
+        boolean berjalan = true;
+        while (berjalan) {
+            System.out.println("\n======== TAMBAH DATA ========");
+       
+            System.out.print("Nomor Pelanggan    : ");
+            String nomor = br.readLine();
+
+            System.out.print("Nama Pelanggan     : ");
+            String nama = br.readLine();
+            
+            System.out.print("Alamat             : ");
+            String alamat = br.readLine();
+
+            System.out.print("Pilih jenis Simpanan (1-5) : ");
+            int kode = Integer.parseInt(br.readLine());
+            
+            System.out.print("Setor tunai : Rp. ");
+            int dp = Integer.parseInt(br.readLine());
+            
+            double bunga = 0;
+            if (dp<=1000000) {
+                bunga = 0.01 * 1;
+            }
+            else if (dp<=2000000) {
+                bunga = 0.01 * 2;
+            }
+            else if (dp>2000000) {
+                bunga = 0.01 * 3;
+            }
+            
+           
+
+            noPelanggan.add(nomor);
+            namaPelanggan.add(nama);
+            alamatPelanggan.add(alamat);
+            kodeSimpanan.add(kode);
+            jumlahDp.add(dp);
+            totalBunga.add(bunga);
+
+            System.out.println("Data berhasil ditambahkan ke database!");
+
+            System.out.print("Apakah kamu ingin menambah data? (y/t): ");
+            String choice = br.readLine().toLowerCase();
+            if (!choice.equals("y")) {
+                berjalan = false;
+            }
+        }
+    }
+
+    static void editPelanggan() throws IOException {
+        System.out.println("\n======== EDIT DATA ========");
+        showAllPelanggan();
+        System.out.print("Pilih nomor pelanggan yang ingin di-edit: ");
+        int index = Integer.parseInt(br.readLine()) - 1;
+
+        if (index >= 0 && index < noPelanggan.size()) {
+            
+            System.out.print("Nomor Pelanggan baru : ");
+            noPelanggan.set(index, br.readLine());
+
+            System.out.print("Nama Pelanggan baru  : ");
+            namaPelanggan.set(index, br.readLine());
+            
+            System.out.print("Alamat baru          : ");
+            alamatPelanggan.set(index, br.readLine());
+
+            System.out.print("Masukkan Pilihan Baru (1-5) : ");
+            int kode = Integer.parseInt(br.readLine());
+            kodeSimpanan.set(index, kode);
+
+
+            System.out.print("Setor tunai ulang : ");
+            int dp = Integer.parseInt(br.readLine());
+            jumlahDp.set(index, dp);
+            
+            double bunga = 0;
+            if (dp<=1000000) {
+                bunga = 0.01 * 1;
+            }
+            else if (dp<=2000000) {
+                bunga = 0.01 * 2;
+            }
+            else if (dp>2000000) {
+                bunga = 0.01 * 3;
+            }
+            totalBunga.set(index, bunga);
+
+
+            System.out.println("Data berhasil diubah!");
+        } else {
+            System.out.println("Data tidak ada dalam database!");
+        }
+    }
+
+    static void deletePelanggan() throws IOException {
+        System.out.println("\n======== HAPUS DATA ========");
+        showAllPelanggan();
+        System.out.print("Pilih nomor pelanggan yang ingin dihapus: ");
+        int index = Integer.parseInt(br.readLine()) - 1;
+
+        if (index >= 0 && index < noPelanggan.size()) {
+            noPelanggan.remove(index);
+            namaPelanggan.remove(index);
+            alamatPelanggan.remove(index);
+            kodeSimpanan.remove(index);
+            totalBunga.remove(index);
+            jumlahDp.remove(index);
+            
+
+            System.out.println("Data berhasil dihapus!");
+        } else {
+            System.out.println("Data tidak ada dalam database!");
+        }
+    }
+
+
+    static String getSimpanan(int kode) {
+        switch (kode) {
+            case 1:
+                return "Simpanan Fitri";
+            case 2:
+                return "Simpanan Qurban";
+            case 3:
+                return "Simpedes";
+            case 4:
+                return "Simpanan Akhirat";
+            case 5:
+                return "Simpanan Umroh";
+            default:
+                return "Simpanan Giat";
+        }
+    }
+}
+        // TODO code application logic here
+    
+    
+
