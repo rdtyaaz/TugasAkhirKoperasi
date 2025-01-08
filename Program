@@ -22,6 +22,7 @@ public class Akhir {
     static ArrayList<Integer> kodeSimpanan = new ArrayList<>();
     static ArrayList<Integer> jumlahDp = new ArrayList<>();
     static ArrayList<Double> totalBunga = new ArrayList<>();
+    static ArrayList<Double> totalS = new ArrayList<>();
     static boolean isRunning = true;
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -50,7 +51,8 @@ public class Akhir {
         System.out.println("2. Tambah Data Pelanggan");
         System.out.println("3. Edit Data Pelanggan");
         System.out.println("4. Hapus Data Pelanggan");
-        System.out.println("5. Keluar");
+        System.out.println("5. Cetak Kwitansi");
+        System.out.println("6. Keluar");
         System.out.print("Pilih menu: ");
 
         int selectedMenu = Integer.parseInt(br.readLine());
@@ -69,6 +71,9 @@ public class Akhir {
                 deletePelanggan();
                 break;
             case 5:
+                kwitansi();
+                break;
+            case 6:
                 isRunning = false;
                 System.out.println("Program dihentikan. Terima kasih!");
                 break;
@@ -104,6 +109,8 @@ static void showAllPelanggan() {
             for (int i = start; i < end; i++) {
                 double totalSimpanan = jumlahDp.get(i) + jumlahDp.get(i) * totalBunga.get(i);
                 grandTotal += totalSimpanan;
+                
+                totalS.add(totalSimpanan);
 
                 System.out.printf("|%-5d|%-17s|%-21s|%-14s|%-20s|%-17d|%-16.0f|%-15.0f|\n",
                     i + 1,
@@ -263,6 +270,37 @@ static void showAllPelanggan() {
             System.out.println("Data tidak ada dalam database!");
         }
     }
+    
+    static void kwitansi() throws IOException {
+        System.out.println("======== CETAK KWITANSI ========");
+        if (noPelanggan.isEmpty()) {
+            System.out.println("Belum ada data untuk dicetak.");
+            return;
+        }
+        
+        showAllPelanggan();
+        System.out.print("Pilih nomor data untuk mencetak kwitansi: ");
+        int index = Integer.parseInt(br.readLine()) - 1;
+
+        if (index >= 0 && index < namaPelanggan.size()) {
+            System.out.println("===============================================");
+            System.out.println("             Koperasi Simpan Pinjam            ");
+            System.out.println("===============================================");
+            System.out.printf("Nama          : %s\n", namaPelanggan.get(index));
+            System.out.printf("Alamat        : %s\n", alamatPelanggan.get(index));
+            System.out.println("-----------------------------------------------");
+            System.out.printf("Koperasi      : %s\n", kodeSimpanan.get(index));
+            System.out.printf("Simpanan      : Rp.%s\n", jumlahDp.get(index));
+            System.out.printf("Bunga (persen): %-10.0f\n", totalBunga.get(index)*100);
+            System.out.println("-----------------------------------------------");
+            System.out.printf("Total Bayar   : Rp.%-10.2f\n", totalS.get(index));
+            System.out.println("-----------------------------------------------");
+            System.out.println("     Terima kasih atas kunjungan Anda !         ");
+            System.out.println("===============================================");
+        } else {
+            System.out.println("Data tidak ditemukan.");
+        }
+    }
 
 
     static String getSimpanan(int kode) {
@@ -283,6 +321,3 @@ static void showAllPelanggan() {
     }
 }
         // TODO code application logic here
-    
-    
-
